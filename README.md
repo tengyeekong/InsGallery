@@ -45,6 +45,11 @@
   <img src="art/overview_video_trim.gif" width="30%" height="30%"/>
 </p>
 
+## Releases:
+
+#### Current release: [![](https://jitpack.io/v/tengyeekong/InsGallery.svg)](https://jitpack.io/#tengyeekong/InsGallery)
+
+
 ## Download
 ``` gradle
  implementation 'me.jessyan:insgallery:0.7.0'
