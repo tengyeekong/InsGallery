@@ -66,7 +66,7 @@ public class InstagramPreviewContainer extends FrameLayout {
     private ImageView mMultiView;
     private boolean mCropGridShowing;
     private Handler mHandler;
-    private boolean isAspectRatio;
+    private boolean isAspectRatio = true;
     private boolean isMulti;
     private onSelectionModeChangedListener mListener;
     private int mPlayMode;
@@ -106,7 +106,7 @@ public class InstagramPreviewContainer extends FrameLayout {
     };
     private AnimatorSet mAnimatorSet;
     private ObjectAnimator mPlayAnimator;
-    private float mAspectRadio;
+    private float mAspectRatio;
 
     public InstagramPreviewContainer(@NonNull Context context, PictureSelectionConfig config) {
         super(context);
@@ -311,15 +311,15 @@ public class InstagramPreviewContainer extends FrameLayout {
     }
 
     private void resetAspectRatio() {
-        mAspectRadio = 0;
+        mAspectRatio = 0;
         if (isAspectRatio) {
             Drawable drawable = mGestureCropImageView.getDrawable();
             if (drawable != null) {
-                mAspectRadio = getInstagramAspectRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                mAspectRatio = getInstagramAspectRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
         }
 
-        mGestureCropImageView.setTargetAspectRatio(isAspectRatio ? mAspectRadio : 1.0f);
+        mGestureCropImageView.setTargetAspectRatio(isAspectRatio ? mAspectRatio : 1.0f);
         mGestureCropImageView.onImageLaidOut();
     }
 
@@ -338,7 +338,7 @@ public class InstagramPreviewContainer extends FrameLayout {
     }
 
     public float getAspectRadio() {
-        return mAspectRadio;
+        return mAspectRatio;
     }
 
     public void setImageUri(@NonNull Uri inputUri, @Nullable Uri outputUri, TransformImageView.OnImageLoadedListener onImageLoadedListener) {
