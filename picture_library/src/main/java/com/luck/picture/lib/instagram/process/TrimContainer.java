@@ -293,9 +293,13 @@ public class TrimContainer extends FrameLayout {
                 uri = Uri.fromFile(new File(mMedia.getPath()));
             }
             mediaMetadataRetriever.setDataSource(getContext(), uri);
+            int videoRotation = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
             int videoWidth = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
             int videoHeight = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-            float instagramAspectRatio = InstagramPreviewContainer.getInstagramAspectRatio(videoWidth, videoHeight);
+            float instagramAspectRatio = InstagramPreviewContainer.getInstagramAspectRatio(
+                    (videoRotation == 90 || videoRotation == 270) ? videoHeight : videoWidth,
+                    (videoRotation == 90 || videoRotation == 270) ? videoWidth : videoHeight
+            );
             mediaMetadataRetriever.release();
 
             if (isAspectRatio && instagramAspectRatio > 0) {
