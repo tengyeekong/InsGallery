@@ -39,6 +39,10 @@ import com.luck.picture.lib.tools.ToastUtils;
 import com.otaliastudios.transcoder.Transcoder;
 import com.otaliastudios.transcoder.TranscoderListener;
 import com.otaliastudios.transcoder.TranscoderOptions;
+import com.otaliastudios.transcoder.resize.AspectRatioResizer;
+import com.otaliastudios.transcoder.resize.FractionResizer;
+import com.otaliastudios.transcoder.resize.PassThroughResizer;
+import com.otaliastudios.transcoder.resize.Resizer;
 import com.otaliastudios.transcoder.sink.DataSink;
 import com.otaliastudios.transcoder.sink.DefaultDataSink;
 import com.otaliastudios.transcoder.source.ClipDataSource;
@@ -46,10 +50,6 @@ import com.otaliastudios.transcoder.source.FilePathDataSource;
 import com.otaliastudios.transcoder.source.UriDataSource;
 import com.otaliastudios.transcoder.strategy.DefaultVideoStrategy;
 import com.otaliastudios.transcoder.strategy.TrackStrategy;
-import com.otaliastudios.transcoder.strategy.size.AspectRatioResizer;
-import com.otaliastudios.transcoder.strategy.size.FractionResizer;
-import com.otaliastudios.transcoder.strategy.size.PassThroughResizer;
-import com.otaliastudios.transcoder.strategy.size.Resizer;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -284,23 +284,24 @@ public class TrimContainer extends FrameLayout {
         }
 
         Resizer resizer = new PassThroughResizer();
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        Uri uri;
+        if (SdkVersionUtils.checkedAndroid_Q() && PictureMimeType.isContent(mMedia.getPath())) {
+            uri = Uri.parse(mMedia.getPath());
+        } else {
+            uri = Uri.fromFile(new File(mMedia.getPath()));
+        }
+        mediaMetadataRetriever.setDataSource(getContext(), uri);
+        int videoWidth = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        int videoHeight = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        int bitrate = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+
         if (mConfig.instagramSelectionConfig.isCropVideo()) {
-            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-            Uri uri;
-            if (SdkVersionUtils.checkedAndroid_Q() && PictureMimeType.isContent(mMedia.getPath())) {
-                uri = Uri.parse(mMedia.getPath());
-            } else {
-                uri = Uri.fromFile(new File(mMedia.getPath()));
-            }
-            mediaMetadataRetriever.setDataSource(getContext(), uri);
             int videoRotation = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
-            int videoWidth = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-            int videoHeight = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
             float instagramAspectRatio = InstagramPreviewContainer.getInstagramAspectRatio(
                     (videoRotation == 90 || videoRotation == 270) ? videoHeight : videoWidth,
                     (videoRotation == 90 || videoRotation == 270) ? videoWidth : videoHeight
             );
-            mediaMetadataRetriever.release();
 
             if (isAspectRatio && instagramAspectRatio > 0) {
                 resizer = new AspectRatioResizer(instagramAspectRatio);
@@ -308,9 +309,25 @@ public class TrimContainer extends FrameLayout {
                 resizer = new AspectRatioResizer(1f);
             }
         }
+        mediaMetadataRetriever.release();
+
+        float fraction = 1f;
+        int maxResolution = mConfig.maxVideoResolution;
+        if (maxResolution > 0) {
+            if (videoWidth > maxResolution || videoHeight > maxResolution) {
+                float ratio = Float.parseFloat(String.valueOf(videoWidth)) / videoHeight;
+                if (ratio > 1) {
+                    fraction = Float.parseFloat(String.valueOf(maxResolution)) / videoWidth;
+                } else {
+                    fraction = Float.parseFloat(String.valueOf((int) (maxResolution * ratio))) / videoWidth;
+                }
+            }
+        }
+
         TrackStrategy videoStrategy = new DefaultVideoStrategy.Builder()
                 .addResizer(resizer)
-                .addResizer(new FractionResizer(1f))
+                .addResizer(new FractionResizer(fraction))
+                .bitRate((int) (bitrate * mConfig.outputVideoBitRatePercent))
                 .build();
 
         DataSink sink = new DefaultDataSink(transcodeOutputFile.getAbsolutePath());

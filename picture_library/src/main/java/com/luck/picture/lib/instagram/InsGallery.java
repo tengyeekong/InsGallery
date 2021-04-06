@@ -126,6 +126,8 @@ public final class InsGallery {
                 .isSingleDirectReturn(false)// 单选模式下是否直接返回，PictureConfig.SINGLE模式下有效
                 .isPreviewImage(true)// 是否可预览图片
                 .isPreviewVideo(true)// 是否可预览视频
+                .maxVideoResolution(1080)
+                .outputVideoBitRatePercent(0.7)
                 //.querySpecifiedFormatSuffix(PictureMimeType.ofJPEG())// 查询指定后缀格式资源
                 .isEnablePreviewAudio(false) // 是否可播放音频
                 .isCamera(false)// 是否显示拍照按钮
