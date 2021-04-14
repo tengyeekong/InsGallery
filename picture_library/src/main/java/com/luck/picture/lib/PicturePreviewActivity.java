@@ -125,6 +125,7 @@ public class PicturePreviewActivity extends PictureBaseActivity implements
         btnCheck.setOnClickListener(this);
         selectData = getIntent().
                 getParcelableArrayListExtra(PictureConfig.EXTRA_SELECT_LIST);
+        selectData = selectData == null ? new ArrayList<>() : selectData;
         isBottomPreview = getIntent().
                 getBooleanExtra(PictureConfig.EXTRA_BOTTOM_PREVIEW, false);
         isShowCamera = getIntent().getBooleanExtra(PictureConfig.EXTRA_SHOW_CAMERA, config.isCamera);

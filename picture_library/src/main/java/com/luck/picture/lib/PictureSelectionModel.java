@@ -773,6 +773,15 @@ public class PictureSelectionModel {
     }
 
     /**
+     * @param minFileSizeForCompression min file size for video compression
+     * @return PictureSelectionModel
+     */
+    public PictureSelectionModel minFileSizeForCompression(int minFileSizeForCompression) {
+        selectionConfig.minFileSizeForCompression = minFileSizeForCompression;
+        return this;
+    }
+
+    /**
      * @param outputVideoBitRatePercent bitrate percentage for the output video
      * @return PictureSelectionModel
      */

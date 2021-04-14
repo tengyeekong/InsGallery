@@ -113,6 +113,7 @@ public final class PictureSelectionConfig implements Parcelable {
     public boolean isOriginalImage;
     public int maxVideoResolution;
     public double outputVideoBitRatePercent;
+    public int minFileSizeForCompression;
     @Deprecated
     public int overrideWidth;
     @Deprecated
@@ -200,6 +201,7 @@ public final class PictureSelectionConfig implements Parcelable {
         isOriginalImage = false;
         maxVideoResolution = 0;
         outputVideoBitRatePercent = 1.0;
+        minFileSizeForCompression = 0;
         isSingleDirectReturn = false;
         enablePreview = true;
         enPreviewVideo = true;
@@ -384,6 +386,7 @@ public final class PictureSelectionConfig implements Parcelable {
         dest.writeByte(this.isOriginalImage ? (byte) 1 : (byte) 0);
         dest.writeInt(this.maxVideoResolution);
         dest.writeDouble(this.outputVideoBitRatePercent);
+        dest.writeInt(this.minFileSizeForCompression);
         dest.writeInt(this.overrideWidth);
         dest.writeInt(this.overrideHeight);
         dest.writeFloat(this.sizeMultiplier);
@@ -492,6 +495,7 @@ public final class PictureSelectionConfig implements Parcelable {
         this.isOriginalImage = in.readByte() != 0;
         this.maxVideoResolution = in.readInt();
         this.outputVideoBitRatePercent = in.readDouble();
+        this.minFileSizeForCompression = in.readInt();
         this.overrideWidth = in.readInt();
         this.overrideHeight = in.readInt();
         this.sizeMultiplier = in.readFloat();
