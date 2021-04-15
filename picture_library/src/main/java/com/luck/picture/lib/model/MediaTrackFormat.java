@@ -7,10 +7,6 @@ import androidx.annotation.NonNull;
 
 public class MediaTrackFormat {
 
-    public static final String KEY_ROTATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            ? MediaFormat.KEY_ROTATION
-            : "rotation-degrees";
-
     public int index;
     public String mimeType;
 
