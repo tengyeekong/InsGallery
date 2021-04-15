@@ -114,10 +114,6 @@ public class TrimContainer extends FrameLayout {
     private Future<Void> mTranscodeFuture;
     private MediaTransformer mediaTransformer;
 
-    private static final String KEY_ROTATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            ? MediaFormat.KEY_ROTATION
-            : "rotation-degrees";
-
     public TrimContainer(@NonNull Context context, PictureSelectionConfig config, LocalMedia media, VideoView videoView, VideoPauseListener videoPauseListener) {
         super(context);
         mPadding = ScreenUtils.dip2px(context, 20);
@@ -419,18 +415,18 @@ public class TrimContainer extends FrameLayout {
                         VideoTrackFormat videoTrack = new VideoTrackFormat(track, mimeType);
                         videoTrack.width = newWidth;
                         videoTrack.height = newHeight;
-                        videoTrack.duration = videoTrack.getLong(mediaFormat, MediaFormat.KEY_DURATION);
-                        videoTrack.frameRate = videoTrack.getInt(mediaFormat, MediaFormat.KEY_FRAME_RATE);
-                        videoTrack.keyFrameInterval = videoTrack.getInt(mediaFormat, MediaFormat.KEY_I_FRAME_INTERVAL);
-                        videoTrack.rotation = videoTrack.getInt(mediaFormat, KEY_ROTATION, 0);
-                        videoTrack.bitrate = videoTrack.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
+                        videoTrack.duration = MediaTrackFormat.getLong(mediaFormat, MediaFormat.KEY_DURATION);
+                        videoTrack.frameRate = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_FRAME_RATE);
+                        videoTrack.keyFrameInterval = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_I_FRAME_INTERVAL);
+                        videoTrack.rotation = MediaTrackFormat.getInt(mediaFormat, MediaTrackFormat.KEY_ROTATION, 0);
+                        videoTrack.bitrate = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
                         tracks.add(videoTrack);
                     } else if (mimeType.startsWith("audio")) {
                         AudioTrackFormat audioTrack = new AudioTrackFormat(track, mimeType);
-                        audioTrack.channelCount = audioTrack.getInt(mediaFormat, MediaFormat.KEY_CHANNEL_COUNT);
-                        audioTrack.samplingRate = audioTrack.getInt(mediaFormat, MediaFormat.KEY_SAMPLE_RATE);
-                        audioTrack.duration = audioTrack.getLong(mediaFormat, MediaFormat.KEY_DURATION);
-                        audioTrack.bitrate = audioTrack.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
+                        audioTrack.channelCount = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_CHANNEL_COUNT);
+                        audioTrack.samplingRate = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_SAMPLE_RATE);
+                        audioTrack.duration = MediaTrackFormat.getLong(mediaFormat, MediaFormat.KEY_DURATION);
+                        audioTrack.bitrate = MediaTrackFormat.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
                         tracks.add(audioTrack);
                     } else {
                         tracks.add(new GenericTrackFormat(track, mimeType));
@@ -487,7 +483,7 @@ public class TrimContainer extends FrameLayout {
                         }
                         trackTransformBuilder.setRenderer(new GlVideoRenderer(filters));
                     }
-                    MediaFormat mediaFormat = targetTrack.createMediaFormat(targetTrack);
+                    MediaFormat mediaFormat = TargetTrack.createMediaFormat(targetTrack);
                     if (mediaFormat != null && targetTrack.format.mimeType.startsWith("video")) {
                         if (mConfig.minFileSizeForCompression > 0 && sizeInMb < mConfig.minFileSizeForCompression) {
                             // set original bitrate

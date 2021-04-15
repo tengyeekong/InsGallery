@@ -1,10 +1,15 @@
 package com.luck.picture.lib.model;
 
 import android.media.MediaFormat;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
 public class MediaTrackFormat {
+
+    public static final String KEY_ROTATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            ? MediaFormat.KEY_ROTATION
+            : "rotation-degrees";
 
     public int index;
     public String mimeType;
@@ -19,18 +24,18 @@ public class MediaTrackFormat {
         this.mimeType = mediaTrackFormat.mimeType;
     }
 
-    public int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key) {
+    public static int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key) {
         return getInt(mediaFormat, key, -1);
     }
 
-    public int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key, int defaultValue) {
+    public static int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key, int defaultValue) {
         if (mediaFormat.containsKey(key)) {
             return mediaFormat.getInteger(key);
         }
         return defaultValue;
     }
 
-    public long getLong(@NonNull MediaFormat mediaFormat, @NonNull String key) {
+    public static long getLong(@NonNull MediaFormat mediaFormat, @NonNull String key) {
         if (mediaFormat.containsKey(key)) {
             return mediaFormat.getLong(key);
         }

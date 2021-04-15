@@ -21,7 +21,7 @@ public class TargetTrack {
     }
 
     @Nullable
-    public MediaFormat createMediaFormat(@Nullable TargetTrack targetTrack) {
+    public static MediaFormat createMediaFormat(@Nullable TargetTrack targetTrack) {
         MediaFormat mediaFormat = null;
         if (targetTrack != null && targetTrack.format != null) {
             mediaFormat = new MediaFormat();
