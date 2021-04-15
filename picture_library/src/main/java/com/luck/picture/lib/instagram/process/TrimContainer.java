@@ -114,7 +114,7 @@ public class TrimContainer extends FrameLayout {
     private Future<Void> mTranscodeFuture;
     private MediaTransformer mediaTransformer;
 
-    public static final String KEY_ROTATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    private static final String KEY_ROTATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
             ? MediaFormat.KEY_ROTATION
             : "rotation-degrees";
 

@@ -1,7 +1,6 @@
 package com.luck.picture.lib.model;
 
 import android.media.MediaFormat;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 
