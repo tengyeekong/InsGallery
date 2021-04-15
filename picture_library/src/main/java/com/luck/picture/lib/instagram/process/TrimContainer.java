@@ -55,6 +55,12 @@ import com.luck.picture.lib.instagram.InsGallery;
 import com.luck.picture.lib.instagram.InstagramPreviewContainer;
 import com.luck.picture.lib.instagram.adapter.InstagramFrameItemDecoration;
 import com.luck.picture.lib.instagram.adapter.VideoTrimmerAdapter;
+import com.luck.picture.lib.model.AudioTrackFormat;
+import com.luck.picture.lib.model.GenericTrackFormat;
+import com.luck.picture.lib.model.MediaTrackFormat;
+import com.luck.picture.lib.model.TargetMedia;
+import com.luck.picture.lib.model.TargetTrack;
+import com.luck.picture.lib.model.VideoTrackFormat;
 import com.luck.picture.lib.thread.PictureThreadUtils;
 import com.luck.picture.lib.tools.DateUtils;
 import com.luck.picture.lib.tools.ScreenUtils;
@@ -413,18 +419,18 @@ public class TrimContainer extends FrameLayout {
                         VideoTrackFormat videoTrack = new VideoTrackFormat(track, mimeType);
                         videoTrack.width = newWidth;
                         videoTrack.height = newHeight;
-                        videoTrack.duration = getLong(mediaFormat, MediaFormat.KEY_DURATION);
-                        videoTrack.frameRate = getInt(mediaFormat, MediaFormat.KEY_FRAME_RATE);
-                        videoTrack.keyFrameInterval = getInt(mediaFormat, MediaFormat.KEY_I_FRAME_INTERVAL);
-                        videoTrack.rotation = getInt(mediaFormat, KEY_ROTATION, 0);
-                        videoTrack.bitrate = getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
+                        videoTrack.duration = videoTrack.getLong(mediaFormat, MediaFormat.KEY_DURATION);
+                        videoTrack.frameRate = videoTrack.getInt(mediaFormat, MediaFormat.KEY_FRAME_RATE);
+                        videoTrack.keyFrameInterval = videoTrack.getInt(mediaFormat, MediaFormat.KEY_I_FRAME_INTERVAL);
+                        videoTrack.rotation = videoTrack.getInt(mediaFormat, KEY_ROTATION, 0);
+                        videoTrack.bitrate = videoTrack.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
                         tracks.add(videoTrack);
                     } else if (mimeType.startsWith("audio")) {
                         AudioTrackFormat audioTrack = new AudioTrackFormat(track, mimeType);
-                        audioTrack.channelCount = getInt(mediaFormat, MediaFormat.KEY_CHANNEL_COUNT);
-                        audioTrack.samplingRate = getInt(mediaFormat, MediaFormat.KEY_SAMPLE_RATE);
-                        audioTrack.duration = getLong(mediaFormat, MediaFormat.KEY_DURATION);
-                        audioTrack.bitrate = getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
+                        audioTrack.channelCount = audioTrack.getInt(mediaFormat, MediaFormat.KEY_CHANNEL_COUNT);
+                        audioTrack.samplingRate = audioTrack.getInt(mediaFormat, MediaFormat.KEY_SAMPLE_RATE);
+                        audioTrack.duration = audioTrack.getLong(mediaFormat, MediaFormat.KEY_DURATION);
+                        audioTrack.bitrate = audioTrack.getInt(mediaFormat, MediaFormat.KEY_BIT_RATE);
                         tracks.add(audioTrack);
                     } else {
                         tracks.add(new GenericTrackFormat(track, mimeType));
@@ -481,7 +487,7 @@ public class TrimContainer extends FrameLayout {
                         }
                         trackTransformBuilder.setRenderer(new GlVideoRenderer(filters));
                     }
-                    MediaFormat mediaFormat = createMediaFormat(targetTrack);
+                    MediaFormat mediaFormat = targetTrack.createMediaFormat(targetTrack);
                     if (mediaFormat != null && targetTrack.format.mimeType.startsWith("video")) {
                         if (mConfig.minFileSizeForCompression > 0 && sizeInMb < mConfig.minFileSizeForCompression) {
                             // set original bitrate
@@ -804,240 +810,5 @@ public class TrimContainer extends FrameLayout {
             ToastUtils.s(trimContainer.getContext(), trimContainer.getContext().getString(R.string.video_clip_failed));
             trimContainer.showLoadingView(false);
         }
-    }
-
-    private int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key) {
-        return getInt(mediaFormat, key, -1);
-    }
-
-    private int getInt(@NonNull MediaFormat mediaFormat, @NonNull String key, int defaultValue) {
-        if (mediaFormat.containsKey(key)) {
-            return mediaFormat.getInteger(key);
-        }
-        return defaultValue;
-    }
-
-    private long getLong(@NonNull MediaFormat mediaFormat, @NonNull String key) {
-        if (mediaFormat.containsKey(key)) {
-            return mediaFormat.getLong(key);
-        }
-        return -1;
-    }
-
-    @Nullable
-    private MediaFormat createMediaFormat(@Nullable TargetTrack targetTrack) {
-        MediaFormat mediaFormat = null;
-        if (targetTrack != null && targetTrack.format != null) {
-            mediaFormat = new MediaFormat();
-            if (targetTrack.format.mimeType.startsWith("video")) {
-                VideoTrackFormat trackFormat = (VideoTrackFormat) targetTrack.format;
-                String mimeType = CodecUtils.MIME_TYPE_VIDEO_AVC;
-                mediaFormat.setString(MediaFormat.KEY_MIME, mimeType);
-                mediaFormat.setInteger(MediaFormat.KEY_WIDTH, trackFormat.width);
-                mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, trackFormat.height);
-                mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, trackFormat.bitrate);
-                mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, trackFormat.keyFrameInterval);
-                mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, trackFormat.frameRate);
-            } else if (targetTrack.format.mimeType.startsWith("audio")) {
-                AudioTrackFormat trackFormat = (AudioTrackFormat) targetTrack.format;
-                mediaFormat.setString(MediaFormat.KEY_MIME, trackFormat.mimeType);
-                mediaFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, trackFormat.channelCount);
-                mediaFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, trackFormat.samplingRate);
-                mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, trackFormat.bitrate);
-            }
-        }
-
-        return mediaFormat;
-    }
-}
-
-class MediaTrackFormat {
-
-    public int index;
-    public String mimeType;
-
-    MediaTrackFormat(int index, @NonNull String mimeType) {
-        this.index = index;
-        this.mimeType = mimeType;
-    }
-
-    MediaTrackFormat(@NonNull MediaTrackFormat mediaTrackFormat) {
-        this.index = mediaTrackFormat.index;
-        this.mimeType = mediaTrackFormat.mimeType;
-    }
-}
-
-class VideoTrackFormat extends MediaTrackFormat {
-
-    public int width;
-    public int height;
-    public int bitrate;
-    public int frameRate;
-    public int keyFrameInterval;
-    public long duration;
-    public int rotation;
-
-    public VideoTrackFormat(int index, @NonNull String mimeType) {
-        super(index, mimeType);
-    }
-
-    public VideoTrackFormat(@NonNull VideoTrackFormat videoTrackFormat) {
-        super(videoTrackFormat);
-        this.width = videoTrackFormat.width;
-        this.height = videoTrackFormat.height;
-        this.bitrate = videoTrackFormat.bitrate;
-        this.frameRate = videoTrackFormat.frameRate;
-        this.keyFrameInterval = videoTrackFormat.keyFrameInterval;
-        this.duration = videoTrackFormat.duration;
-        this.rotation = videoTrackFormat.rotation;
-    }
-}
-
-class AudioTrackFormat extends MediaTrackFormat {
-
-    public int channelCount;
-    public int samplingRate;
-    public int bitrate;
-    public long duration;
-
-    public AudioTrackFormat(int index, @NonNull String mimeType) {
-        super(index, mimeType);
-    }
-
-    public AudioTrackFormat(@NonNull AudioTrackFormat audioTrackFormat) {
-        super(audioTrackFormat);
-        this.channelCount = audioTrackFormat.channelCount;
-        this.samplingRate = audioTrackFormat.samplingRate;
-        this.bitrate = audioTrackFormat.bitrate;
-        this.duration = audioTrackFormat.duration;
-    }
-}
-
-class GenericTrackFormat extends MediaTrackFormat {
-
-    public GenericTrackFormat(int index, @NonNull String mimeType) {
-        super(index, mimeType);
-    }
-}
-
-class TargetMedia {
-
-    public static final int DEFAULT_VIDEO_WIDTH = 1280;
-    public static final int DEFAULT_VIDEO_HEIGHT = 720;
-    public static final int DEFAULT_VIDEO_BITRATE = 2500000;
-    public static final int DEFAULT_KEY_FRAME_INTERVAL = 5;
-    public static final int DEFAULT_AUDIO_BITRATE = 128000;
-
-    public File targetFile;
-    public List<TargetTrack> tracks = new ArrayList<>();
-    public Uri backgroundImageUri;
-    public GlFilter filter;
-
-    public void setTracks(@NonNull List<MediaTrackFormat> sourceTracks) {
-        tracks = new ArrayList<>(sourceTracks.size());
-        for (MediaTrackFormat sourceTrackFormat : sourceTracks) {
-            TargetTrack targetTrack;
-            if (sourceTrackFormat instanceof VideoTrackFormat) {
-                VideoTrackFormat trackFormat = new VideoTrackFormat((VideoTrackFormat) sourceTrackFormat);
-                trackFormat.width = DEFAULT_VIDEO_WIDTH;
-                trackFormat.height = DEFAULT_VIDEO_HEIGHT;
-                trackFormat.bitrate = DEFAULT_VIDEO_BITRATE;
-                trackFormat.keyFrameInterval = DEFAULT_KEY_FRAME_INTERVAL;
-                targetTrack = new TargetVideoTrack(sourceTrackFormat.index,
-                        true,
-                        false,
-                        trackFormat);
-            } else if (sourceTrackFormat instanceof AudioTrackFormat) {
-                AudioTrackFormat trackFormat = new AudioTrackFormat((AudioTrackFormat) sourceTrackFormat);
-                trackFormat.bitrate = DEFAULT_AUDIO_BITRATE;
-                targetTrack = new TargetAudioTrack(sourceTrackFormat.index,
-                        true,
-                        false,
-                        trackFormat);
-            } else {
-                targetTrack = new TargetTrack(sourceTrackFormat.index,
-                        true,
-                        false,
-                        new MediaTrackFormat(sourceTrackFormat));
-            }
-            tracks.add(targetTrack);
-        }
-    }
-
-    public void setTargetFile(@NonNull File targetFile) {
-        this.targetFile = targetFile;
-    }
-
-    public int getIncludedTrackCount() {
-        int trackCount = 0;
-        for (TargetTrack track : tracks) {
-            if (track.shouldInclude) {
-                trackCount++;
-            }
-        }
-        return trackCount;
-    }
-
-    public void setOverlayImageUri(@NonNull Uri overlayImageUri) {
-        for (TargetTrack targetTrack : tracks) {
-            if (targetTrack instanceof TargetVideoTrack) {
-                ((TargetVideoTrack) targetTrack).overlay = overlayImageUri;
-            }
-        }
-    }
-
-    @Nullable
-    public Uri getVideoOverlay() {
-        for (TargetTrack targetTrack : tracks) {
-            if ((targetTrack instanceof TargetVideoTrack) && ((TargetVideoTrack) targetTrack).overlay != null) {
-                return ((TargetVideoTrack) targetTrack).overlay;
-            }
-        }
-        return null;
-    }
-
-}
-
-class TargetTrack {
-    public int sourceTrackIndex;
-    public boolean shouldInclude;
-    public boolean shouldTranscode;
-    public MediaTrackFormat format;
-
-    public TargetTrack(int sourceTrackIndex, boolean shouldInclude, boolean shouldTranscode, @NonNull MediaTrackFormat format) {
-        this.sourceTrackIndex = sourceTrackIndex;
-        this.shouldInclude = shouldInclude;
-        this.shouldTranscode = shouldTranscode;
-        this.format = format;
-    }
-}
-
-class TargetVideoTrack extends TargetTrack {
-
-    public boolean shouldApplyOverlay;
-    public Uri overlay;
-
-    public TargetVideoTrack(int sourceTrackIndex,
-                            boolean shouldInclude,
-                            boolean shouldTranscode,
-                            VideoTrackFormat format) {
-        super(sourceTrackIndex, shouldInclude, shouldTranscode, format);
-    }
-
-    public VideoTrackFormat getTrackFormat() {
-        return (VideoTrackFormat) format;
-    }
-}
-
-class TargetAudioTrack extends TargetTrack {
-    public TargetAudioTrack(int sourceTrackIndex,
-                            boolean shouldInclude,
-                            boolean shouldTranscode,
-                            AudioTrackFormat format) {
-        super(sourceTrackIndex, shouldInclude, shouldTranscode, format);
-    }
-
-    public AudioTrackFormat getTrackFormat() {
-        return (AudioTrackFormat) format;
     }
 }

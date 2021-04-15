@@ -133,7 +133,6 @@ public final class InsGallery {
                 .isPreviewImage(true)// 是否可预览图片
                 .isPreviewVideo(true)// 是否可预览视频
                 .maxVideoResolution(1080)
-                .outputVideoBitRatePercent(0.7)
                 //.querySpecifiedFormatSuffix(PictureMimeType.ofJPEG())// 查询指定后缀格式资源
                 .isEnablePreviewAudio(false) // 是否可播放音频
                 .isCamera(false)// 是否显示拍照按钮
@@ -165,7 +164,6 @@ public final class InsGallery {
                 //.videoQuality()// 视频录制质量 0 or 1
                 //.videoSecond()//显示多少秒以内的视频or音频也可适用
                 .isQuickCapture(false)
-                .maxVideoResolution(1080)
                 ;
     }
 
