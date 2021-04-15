@@ -483,6 +483,7 @@ public class TrimContainer extends FrameLayout {
                         }
                         trackTransformBuilder.setRenderer(new GlVideoRenderer(filters));
                     }
+
                     MediaFormat mediaFormat = TargetTrack.createMediaFormat(targetTrack);
                     if (mediaFormat != null && targetTrack.format.mimeType.startsWith("video")) {
                         if (mConfig.minFileSizeForCompression > 0 && sizeInMb < mConfig.minFileSizeForCompression) {
@@ -492,6 +493,7 @@ public class TrimContainer extends FrameLayout {
                         mediaFormat.setInteger(MediaFormat.KEY_WIDTH, newWidth);
                         mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, newHeight);
                     }
+
                     trackTransformBuilder.setTargetFormat(mediaFormat);
                     trackTransforms.add(trackTransformBuilder.build());
                 }
