@@ -367,22 +367,6 @@ public class TrimContainer extends FrameLayout {
                 }
             }
 
-            int minResolution = 720;
-            // minimum resolution for mediacodec is 720
-            if (newWidth < minResolution || newHeight < minResolution) {
-                if (ratio > 1) {
-                    newWidth = (int) (minResolution * ratio);
-                    newWidthNonRatio = newWidth;
-                    newHeight = minResolution;
-                    newHeightNonRatio = newHeight;
-                } else {
-                    newWidth = minResolution;
-                    newWidthNonRatio = newWidth;
-                    newHeight = (int) (minResolution / ratio);
-                    newHeightNonRatio = newHeight;
-                }
-            }
-
             if (!isAspectRatio) {
                 if (newWidth > newHeight) {
                     if (videoHeight > newWidth) {
@@ -401,6 +385,26 @@ public class TrimContainer extends FrameLayout {
                         newHeight = videoWidth;
                     }
                 }
+            }
+
+            // rounding odd width
+            if (newWidth % 10 != 0) {
+                String widthString = String.valueOf(newWidth);
+                String widthStringFront = widthString.substring(0, widthString.length() - 2);
+                String lastTwoChars = widthString.substring(widthString.length() - 2);
+                int lastTwoNumbers = Integer.parseInt(lastTwoChars);
+                lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
+                newWidth = Integer.parseInt(widthStringFront + lastTwoChars);
+            }
+
+            // rounding odd height
+            if (newHeight % 10 != 0) {
+                String heightString = String.valueOf(newHeight);
+                String heightStringFront = heightString.substring(0, heightString.length() - 2);
+                String lastTwoChars = heightString.substring(heightString.length() - 2);
+                int lastTwoNumbers = Integer.parseInt(lastTwoChars);
+                lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
+                newHeight = Integer.parseInt(heightStringFront + lastTwoChars);
             }
 
             try {
