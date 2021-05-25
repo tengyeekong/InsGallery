@@ -337,6 +337,7 @@ public class TrimContainer extends FrameLayout {
             File transcodeOutputFile;
             try {
                 File outputDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES), "TrimVideos");
+//                File outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 //noinspection ResultOfMethodCallIgnored
                 outputDir.mkdir();
                 transcodeOutputFile = File.createTempFile(DateUtils.getCreateFileName("trim_"), ".mp4", outputDir);
@@ -390,21 +391,33 @@ public class TrimContainer extends FrameLayout {
             // rounding odd width
             if (newWidth % 10 != 0) {
                 String widthString = String.valueOf(newWidth);
-                String widthStringFront = widthString.substring(0, widthString.length() - 2);
-                String lastTwoChars = widthString.substring(widthString.length() - 2);
-                int lastTwoNumbers = Integer.parseInt(lastTwoChars);
-                lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
-                newWidth = Integer.parseInt(widthStringFront + lastTwoChars);
+                if (widthString.length() < 2) {
+                    newWidth = 10;
+                } else {
+                    String widthStringFront = widthString.substring(0, widthString.length() - 2);
+                    String lastTwoChars = widthString.substring(widthString.length() - 2);
+                    int lastTwoNumbers = Integer.parseInt(lastTwoChars);
+                    lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
+                    if (lastTwoChars.equals("0"))
+                        lastTwoChars += "0";
+                    newWidth = Integer.parseInt(widthStringFront + lastTwoChars);
+                }
             }
 
             // rounding odd height
             if (newHeight % 10 != 0) {
                 String heightString = String.valueOf(newHeight);
-                String heightStringFront = heightString.substring(0, heightString.length() - 2);
-                String lastTwoChars = heightString.substring(heightString.length() - 2);
-                int lastTwoNumbers = Integer.parseInt(lastTwoChars);
-                lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
-                newHeight = Integer.parseInt(heightStringFront + lastTwoChars);
+                if (heightString.length() < 2) {
+                    newHeight = 10;
+                } else {
+                    String heightStringFront = heightString.substring(0, heightString.length() - 2);
+                    String lastTwoChars = heightString.substring(heightString.length() - 2);
+                    int lastTwoNumbers = Integer.parseInt(lastTwoChars);
+                    lastTwoChars = String.valueOf(Math.round(lastTwoNumbers / 10.0) * 10);
+                    if (lastTwoChars.equals("0"))
+                        lastTwoChars += "0";
+                    newHeight = Integer.parseInt(heightStringFront + lastTwoChars);
+                }
             }
 
             try {
